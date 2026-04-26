@@ -1077,7 +1077,7 @@ function NPCSection({ isDM }){
 export default function App(){
   const [user,setUser]=useState(null)
   const [profile,setProfile]=useState(null)
-  const [view,setView]=useState('mondo')
+  const [view,setView]=useState('npc')
   const [sidebarOpen,setSidebarOpen]=useState(false)
   const [loading,setLoading]=useState(true)
   const router=useRouter()
@@ -1331,7 +1331,7 @@ export default function App(){
         if(playerName==='minerva'||playerName==='talia'){
           if(!isDM && profile?.character_name?.toLowerCase()!==playerName)
             return<Empty msg="Accesso non autorizzato"/>
-          const playerProfile = [{name:'Minerva',color:'#c084fc'},{name:'Talia',color:'#fb923c'}].find(p=>p.name.toLowerCase()===playerName)
+          const playerProfile = [{name:'Minerva',color:'#fb923c'},{name:'Talia',color:'#c084fc'}].find(p=>p.name.toLowerCase()===playerName)
           return <PlayerSheet playerName={playerName} playerColor={playerProfile?.color||C.red2} isOwner={isDM || profile?.character_name?.toLowerCase()===playerName}/>
         }
         return<Empty msg="Sezione non trovata"/>
@@ -1419,7 +1419,7 @@ export default function App(){
         <div style={{height:1,background:C.border,margin:'6px 18px'}}/>
         <div style={{padding:'14px 0 6px'}}>
           <div style={{fontSize:10,fontWeight:600,letterSpacing:'.18em',textTransform:'uppercase',color:C.textMuted,padding:'0 18px 6px'}}>La Compagnia</div>
-          {[{name:'Minerva',color:'#c084fc'},{name:'Talia',color:'#fb923c'}].map(p=>(
+          {[{name:'Minerva',color:'#fb923c'},{name:'Talia',color:'#c084fc'}].map(p=>(
             <div key={p.name} onClick={()=>nav(p.name.toLowerCase())} style={{display:'flex',alignItems:'center',gap:10,padding:'9px 18px',cursor:'pointer',fontSize:13,color:view===p.name.toLowerCase()?C.red2:C.textDim,background:view===p.name.toLowerCase()?'rgba(192,57,43,.1)':'transparent',borderLeft:`2px solid ${view===p.name.toLowerCase()?C.red:'transparent'}`}}>
               <span style={{width:8,height:8,borderRadius:'50%',background:p.color,flexShrink:0,display:'inline-block'}}/>
               {p.name}
