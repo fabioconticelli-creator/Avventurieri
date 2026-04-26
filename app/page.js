@@ -326,10 +326,9 @@ function PlayerSheet({playerName,playerColor,isOwner}){
     setChar(c=>c?({...c,[key]:v}):null)
     if(char){
       await supabase.from('player_characters').update({[key]:v}).eq('id',char.id)
-    } else if(playerId) {
-      // Se non c'è ancora una scheda, la crea con solo le monete
+    } else if(playerId){
       const {data}=await supabase.from('player_characters').insert([{...EC,[key]:v,player_id:playerId}]).select()
-      if(data) setChar(data[0])
+      if(data){setChar(data[0]);setCharForm({...EC,...data[0]})}
     }
   }
 
@@ -543,8 +542,8 @@ function PlayerSheet({playerName,playerColor,isOwner}){
               {isOwner
                 ?<input
                     type="number" min="0"
-                    defaultValue={charForm[k]??0}
-                    key={`${k}-${charForm[k]}`}
+                    value={charForm[k]??0}
+                    onChange={e=>setCharForm(f=>({...f,[k]:parseInt(e.target.value)||0}))}
                     onBlur={e=>handleCoin(k,e.target.value)}
                     style={{width:'100%',textAlign:'center',padding:'4px 2px',border:`1px solid ${col}44`,borderRadius:4,fontSize:16,fontWeight:700,color:col,background:C.bg,boxSizing:'border-box',fontFamily:"'Cinzel',serif",outline:'none'}}
                   />
