@@ -274,22 +274,25 @@ function PlayerSheet({playerName,playerColor,isOwner}){
   const inp={width:'100%',boxSizing:'border-box',padding:'9px 12px',background:C.bg3,border:`1px solid ${C.border2}`,borderRadius:8,fontSize:15,color:C.text,fontFamily:'inherit',outline:'none',marginTop:4}
 
   useEffect(()=>{
-    supabase.auth.getUser().then(({data:{user}})=>{
-      if(!user){setLoading(false);return}
-      setPlayerId(user.id)
-      Promise.all([
-        supabase.from('player_characters').select('*').eq('player_id',user.id).maybeSingle(),
-        supabase.from('player_inventory').select('*').eq('player_id',user.id),
-        supabase.from('player_companions').select('*').eq('player_id',user.id),
-        supabase.from('player_session_notes').select('*').eq('player_id',user.id).order('created_at',{ascending:false}),
-      ]).then(([c,inv,comp,n])=>{
-        if(c.data){setChar(c.data);setCharForm({...EC,...c.data})}
-        setInventory(inv.data||[])
-        setCompanions(comp.data||[])
-        setNotes(n.data||[])
-        setLoading(false)
+    // Trova l'ID del giocatore dal nome del personaggio
+    supabase.from('profiles').select('id').ilike('character_name', playerName).maybeSingle()
+      .then(({data:profileData})=>{
+        const pid = profileData?.id
+        if(!pid){setLoading(false);return}
+        setPlayerId(pid)
+        Promise.all([
+          supabase.from('player_characters').select('*').eq('player_id',pid).maybeSingle(),
+          supabase.from('player_inventory').select('*').eq('player_id',pid),
+          supabase.from('player_companions').select('*').eq('player_id',pid),
+          supabase.from('player_session_notes').select('*').eq('player_id',pid).order('created_at',{ascending:false}),
+        ]).then(([c,inv,comp,n])=>{
+          if(c.data){setChar(c.data);setCharForm({...EC,...c.data})}
+          setInventory(inv.data||[])
+          setCompanions(comp.data||[])
+          setNotes(n.data||[])
+          setLoading(false)
+        })
       })
-    })
   },[playerName])
 
   const saveChar=async()=>{
@@ -538,7 +541,13 @@ function PlayerSheet({playerName,playerColor,isOwner}){
             <div key={k} style={{textAlign:'center',background:C.bg3,border:`1px solid ${C.border}`,borderRadius:8,padding:'10px 4px'}}>
               <div style={{fontSize:11,fontWeight:700,color:col,marginBottom:6}}>{l}</div>
               {isOwner
-                ?<input type="number" min="0" value={charForm[k]??0} onChange={e=>handleCoin(k,e.target.value)} style={{width:'100%',textAlign:'center',padding:'4px 2px',border:`1px solid ${col}44`,borderRadius:4,fontSize:16,fontWeight:700,color:col,background:C.bg,boxSizing:'border-box',fontFamily:"'Cinzel',serif",outline:'none'}}/>
+                ?<input
+                    type="number" min="0"
+                    defaultValue={charForm[k]??0}
+                    key={`${k}-${charForm[k]}`}
+                    onBlur={e=>handleCoin(k,e.target.value)}
+                    style={{width:'100%',textAlign:'center',padding:'4px 2px',border:`1px solid ${col}44`,borderRadius:4,fontSize:16,fontWeight:700,color:col,background:C.bg,boxSizing:'border-box',fontFamily:"'Cinzel',serif",outline:'none'}}
+                  />
                 :<div style={{fontSize:20,fontWeight:700,color:col}}>{charForm[k]??0}</div>
               }
             </div>
