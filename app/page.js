@@ -298,7 +298,7 @@ function PlayerSheet({playerName,playerColor,isOwner}){
   const saveChar=async()=>{
     if(!playerId) return
     if(char){
-      const {data}=await supabase.from('player_characters').update(charForm).eq('id',char.id).select()
+      const {data}=await supabase.from('player_characters').update(charForm).eq('id',char.id).eq('player_id',playerId).select()
       if(data) setChar(data[0])
     } else {
       const {data}=await supabase.from('player_characters').insert([{...charForm,player_id:playerId}]).select()
