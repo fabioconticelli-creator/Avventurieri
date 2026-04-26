@@ -1253,7 +1253,7 @@ function NPCSection({ isDM }){
                     // DM vede le note di tutte le giocatrici
                     ?<div style={{display:'flex',flexDirection:'column',gap:12}}>
                       {[{name:'Minerva',color:'#fb923c'},{name:'Talia',color:'#c084fc'}].map(p=>{
-                        const pNote=Object.values(playerNotes).find(n=>n.playerName===p.name)
+                        const pNote=playerNotes[selected.id]?.[p.name]
                         return <div key={p.name}>
                           <div style={{fontSize:10,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',color:p.color,marginBottom:4}}>{p.name}</div>
                           {pNote?.relationship&&<div style={{fontSize:13,color:C.text,marginBottom:4}}><span style={{color:C.textDim}}>Relazione: </span>{pNote.relationship}</div>}
