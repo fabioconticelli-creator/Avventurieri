@@ -235,7 +235,7 @@ export default function App(){
   const [modalVals,setModalVals]=useState({})
   const [saving,setSaving]=useState(false)
 
-  const isDM=profile?.role==='dm'
+  const isDM = profile?.role==='dm' || user?.email==='master@email.com'
 
   useEffect(()=>{
     supabase.auth.getSession().then(({data:{session}})=>{
