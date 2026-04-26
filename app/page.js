@@ -726,7 +726,7 @@ function MapSection({isDM}){
   useEffect(()=>{
     supabase.from('map_pins').select('*').then(({data})=>setPins(data||[]))
     supabase.from('map_config').select('map_path').eq('id',1).maybeSingle().then(({data})=>{
-      if(data?.map_path) setMapUrl(getPublicUrl('map-images',data.map_path)+'?t='+Date.now())
+      if(data?.map_path) setMapUrl(getPublicUrl('map-images',data.map_path))
       setLoading(false)
     })
   },[])
@@ -739,7 +739,7 @@ function MapSection({isDM}){
     const {error}=await supabase.storage.from('map-images').upload(path,file)
     if(error){alert('Errore upload: '+error.message);setUploading(false);return}
     await supabase.from('map_config').upsert({id:1,map_path:path,updated_at:new Date().toISOString()})
-    setMapUrl(getPublicUrl('map-images',path)+'?t='+Date.now())
+    setMapUrl(getPublicUrl('map-images',path))
     setUploading(false)
   }
 
