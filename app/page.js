@@ -1039,7 +1039,7 @@ const VITALITY_COLORS = { vivo:'#2ecc71', morto:'#e74c3c', sconosciuto:'#8a7fa0'
 function ImgUpload({ bucket, folder, currentPath, onUploaded }){
   const [uploading, setUploading]=useState(false)
   const ref=useRef()
-  const url=getPublicUrl(bucket, currentPath)
+  const url=currentPath?getPublicUrl(bucket, currentPath):null
   const handle=async(e)=>{
     const file=e.target.files[0]; if(!file) return
     setUploading(true)
