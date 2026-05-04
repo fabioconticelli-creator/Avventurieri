@@ -1735,12 +1735,11 @@ export default function App(){
             <div style={{width:26,height:26,borderRadius:'50%',background:`radial-gradient(circle at 35% 35%,${C.red2},${C.redDim})`,boxShadow:`0 0 10px rgba(192,57,43,.4)`,flexShrink:0}}/>
             <span style={{fontFamily:"'Cinzel',serif",fontSize:16,fontWeight:600,color:C.red2,letterSpacing:'.06em'}}>{TITLES[view]||view.charAt(0).toUpperCase()+view.slice(1)}</span>
           </div>
-          {isDM&&view!=='npc'&&(
+          {isDM&&view!=='npc'&&view!=='cronologia'&&(
             <button onClick={()=>openModal(
               view==='sessioni'?'sessions':
               view==='fazioni'?'factions':
               view==='mondo'?'locations':
-              view==='cronologia'?'timeline':
               view==='arcano'?'arcane':
               view==='tomo'?'tome':'sessions'
             )} style={{fontSize:12,fontWeight:600,padding:'6px 14px',borderRadius:8,background:C.red,color:'#fff',border:'none',cursor:'pointer'}}>+ Aggiungi</button>
