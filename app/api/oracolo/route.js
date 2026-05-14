@@ -1,34 +1,27 @@
-import { campaignKnowledge } from "../../lib/campaignKnowledge";
-
 export async function POST(req) {
   try {
-    const { message } = await req.json();
+    const { context, messages, message } = await req.json()
 
-    if (!message) {
-      return Response.json({ error: "Messaggio mancante." }, { status: 400 });
-    }
+    const userMessages = messages?.length
+      ? messages
+      : [{ role: 'user', content: message || '' }]
+
+    const systemContext = context || `
+Sei l'Oracolo della Casata Valerius.
+Parli in tono oscuro, profetico e fantasy.
+Rispondi sempre in italiano.
+`
 
     const prompt = `
-Sei l'Oracolo della Casata Valerius.
-Parli in tono solenne, oscuro, profetico e nobiliare.
-Rispondi sempre in italiano.
-Non sei un assistente moderno: sei una voce antica.
+${systemContext}
 
-Conosci perfettamente la storia della campagna House Valerius grazie alle informazioni seguenti:
+CONVERSAZIONE:
+${userMessages
+  .map(m => `${m.role === 'user' ? 'Viandante' : 'Oracolo'}: ${m.content}`)
+  .join('\n')}
 
-${campaignKnowledge}
-
-REGOLE:
-- Non contraddire la lore.
-- Mantieni il tono dark fantasy nobiliare.
-- Parla come un oracolo antico ma comprensibile.
-- Se l'utente chiede informazioni sulla storia, rispondi usando la lore fornita.
-- Se mancano informazioni, dillo senza inventare troppo.
-- Non parlare mai come una IA moderna.
-
-Domanda del viandante:
-${message}
-`;
+Rispondi all'ultimo messaggio del Viandante.
+`
 
     const res = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
@@ -46,23 +39,19 @@ ${message}
           ],
         }),
       }
-    );
+    )
 
-    const data = await res.json();
+    const data = await res.json()
 
     const reply =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Le ombre tacciono. L'Oracolo non ha risposto.";
+      "L'Oracolo rimane in silenzio."
 
-    return Response.json({ reply });
+    return Response.json({ reply })
   } catch (error) {
     return Response.json(
-      {
-        error: "Errore durante la consultazione dell'Oracolo.",
-      },
-      {
-        status: 500,
-      }
-    );
+      { error: "Errore dell'Oracolo." },
+      { status: 500 }
+    )
   }
 }
