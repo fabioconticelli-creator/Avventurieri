@@ -1,3 +1,5 @@
+import { campaignKnowledge } from "../../lib/campaignKnowledge";
+
 export async function POST(req) {
   try {
     const { message } = await req.json();
@@ -8,10 +10,21 @@ export async function POST(req) {
 
     const prompt = `
 Sei l'Oracolo della Casata Valerius.
-Parli in tono solenne, oscuro, profetico e fantasy.
-Rispondi in italiano.
+Parli in tono solenne, oscuro, profetico e nobiliare.
+Rispondi sempre in italiano.
 Non sei un assistente moderno: sei una voce antica.
-Dai risposte utili, ma con stile evocativo.
+
+Conosci perfettamente la storia della campagna House Valerius grazie alle informazioni seguenti:
+
+${campaignKnowledge}
+
+REGOLE:
+- Non contraddire la lore.
+- Mantieni il tono dark fantasy nobiliare.
+- Parla come un oracolo antico ma comprensibile.
+- Se l'utente chiede informazioni sulla storia, rispondi usando la lore fornita.
+- Se mancano informazioni, dillo senza inventare troppo.
+- Non parlare mai come una IA moderna.
 
 Domanda del viandante:
 ${message}
@@ -44,8 +57,12 @@ ${message}
     return Response.json({ reply });
   } catch (error) {
     return Response.json(
-      { error: "Errore durante la consultazione dell'Oracolo." },
-      { status: 500 }
+      {
+        error: "Errore durante la consultazione dell'Oracolo.",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
