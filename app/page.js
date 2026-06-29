@@ -343,7 +343,7 @@ const TABLE_MAP = {
   ]},
   cronologia: { table:"timeline", fields:[
     {id:"date",l:"Data",ph:"Anno 1, Giorno X"},{id:"title",l:"Titolo",ph:"Evento..."},
-    {id:"desc",l:"Descrizione",ph:"Cosa accadde...",ta:true}
+    {id:"description",l:"Descrizione",ph:"Cosa accadde...",ta:true},{id:"image_path",l:"URL Immagine",ph:"https://..."}
   ]},
   arcano: { table:"arcane", fields:[
     {id:"name",l:"Nome",ph:"Nome"},{id:"icon",l:"Icona",ph:"✨"},
@@ -559,7 +559,8 @@ export default function App(){
               <div style={{position:"absolute",left:-21,top:5,width:8,height:8,border:`1px solid ${C.goldDim}`,background:C.bg,transform:"rotate(45deg)"}}/>
               <div style={{fontSize:10,fontWeight:600,letterSpacing:".15em",textTransform:"uppercase",color:C.goldDim,marginBottom:3}}>{c.date}</div>
               <div style={{fontFamily:"'Cinzel',serif",fontSize:14,fontWeight:600,color:C.text,marginBottom:4}}>{c.title}</div>
-              <div style={{fontSize:13,color:C.textDim,fontStyle:"italic",lineHeight:1.55}}>{c.desc}</div>
+              <div style={{fontSize:13,color:C.textDim,fontStyle:"italic",lineHeight:1.55}}>{c.description}</div>
+              {c.image_path&&<img src={c.image_path} alt={c.title} style={{width:"100%",borderRadius:10,border:`1px solid ${C.border2}`,objectFit:"cover",maxHeight:220,marginTop:8,display:"block"}}/>}
               <EditBtns v="cronologia" item={c}/>
             </div>
           ))}
