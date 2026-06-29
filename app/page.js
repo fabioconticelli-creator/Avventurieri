@@ -385,8 +385,8 @@ const TABLE_MAP = {
 export default function App(){
   const [data,setData]=useState({sessioni:[],npc:[],gilda:[],fazioni:[],mondo:[],cronologia:[],tomo:[],map_pins:[],map_config:null});
   const [loading,setLoading]=useState(true);
-  const [view,setView]=useState("mondo");
-  const [isAuth,setIsAuth]=useState(false);
+  const [view,setView]=useState("sessioni");
+  const [isAuth,setIsAuth]=useState(()=>{ try{ return localStorage.getItem("dm_auth")==="true"; }catch(e){ return false; } });
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [showPin,setShowPin]=useState(false);
   const [npcOpen,setNpcOpen]=useState(null);
@@ -434,7 +434,7 @@ export default function App(){
   useEffect(()=>{ loadAll(); },[]);
 
   const nav=(v)=>{setView(v);setSidebarOpen(false);};
-  const toggleDm=()=>{ if(isAuth){setIsAuth(false);}else{setShowPin(true);} };
+  const toggleDm=()=>{ if(isAuth){ setIsAuth(false); try{localStorage.removeItem("dm_auth");}catch(e){} }else{setShowPin(true);} };
 
   // ── NPC ──
   const openNpcAdd = () => { if(!isAuth){setShowPin(true);return;} setNpcModal({}); };
@@ -802,7 +802,7 @@ export default function App(){
         </div>
       </div>
     </div>}
-    {showPin&&<PinModal onSuccess={()=>{setIsAuth(true);setShowPin(false);}} onClose={()=>setShowPin(false)}/>}
+    {showPin&&<PinModal onSuccess={()=>{ setIsAuth(true); setShowPin(false); try{localStorage.setItem("dm_auth","true");}catch(e){} }} onClose={()=>setShowPin(false)}/>}
     {npcModal&&<NpcFormModal npc={npcModal?.id?npcModal:null} onClose={()=>setNpcModal(null)} onSaved={()=>{setNpcModal(null);loadAll();}}/>}
     {genericModal&&<GenericModal
       title={genericModal.item?"Modifica":"Aggiungi"}
