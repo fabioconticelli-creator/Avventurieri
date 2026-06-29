@@ -162,9 +162,40 @@ function NpcFormModal({npc, onClose, onSaved}){
   </Modal>;
 }
 
-function GenericModal({title, fields, vals, onClose, onSave, saving, onChange}){
+function GenericModal({title, fields, vals, onClose, onSave, saving, onChange, hasImage, imageBucket, imageField}){
+  const [imgFile, setImgFile] = useState(null);
+  const [imgPreview, setImgPreview] = useState(vals[imageField||"image_path"]||"");
   const inp = {width:"100%",background:C.bg,border:`1px solid ${C.border2}`,borderRadius:8,color:C.text,fontFamily:"inherit",fontSize:14,padding:"8px 12px",outline:"none",marginTop:4,boxSizing:"border-box"};
-  return <Modal title={title} onClose={onClose} onSave={onSave} saving={saving}>
+
+  const handleSave = async () => {
+    if(hasImage && imgFile) {
+      const ext = imgFile.name.split(".").pop();
+      const path = `${Date.now()}.${ext}`;
+      const {error:upErr} = await supabase.storage.from(imageBucket).upload(path, imgFile, {upsert:true});
+      if(upErr){ alert("Errore upload: "+upErr.message); return; }
+      const {data:urlData} = supabase.storage.from(imageBucket).getPublicUrl(path);
+      onChange(imageField, urlData.publicUrl);
+      setTimeout(()=>onSave(), 100);
+    } else {
+      onSave();
+    }
+  };
+
+  return <Modal title={title} onClose={onClose} onSave={handleSave} saving={saving}>
+    {hasImage&&<div style={{marginBottom:13}}>
+      <label style={{display:"block",fontSize:10,fontWeight:700,letterSpacing:".15em",textTransform:"uppercase",color:C.textDim}}>Immagine</label>
+      <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:8}}>
+        {imgPreview
+          ? <img src={imgPreview} style={{width:"100%",maxHeight:220,objectFit:"cover",borderRadius:10,border:`1px solid ${C.border2}`}}/>
+          : <div style={{width:"100%",height:100,background:C.bg3,borderRadius:10,border:`2px dashed ${C.border2}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,color:C.textMuted}}>🖼️</div>
+        }
+        <label style={{background:C.bg3,border:`1px solid ${C.border2}`,borderRadius:8,padding:"8px 16px",cursor:"pointer",fontSize:12,color:C.textDim,textAlign:"center",width:"100%",boxSizing:"border-box"}}>
+          📷 Scegli foto dal telefono
+          <input type="file" accept="image/*" onChange={e=>{const f=e.target.files[0];if(f){setImgFile(f);setImgPreview(URL.createObjectURL(f));onChange(imageField,"");} }} style={{display:"none"}}/>
+        </label>
+        {imgPreview&&<button onClick={()=>{setImgFile(null);setImgPreview("");onChange(imageField,"");}} style={{fontSize:11,color:"#f87171",background:"none",border:"none",cursor:"pointer"}}>✕ Rimuovi immagine</button>}
+      </div>
+    </div>}
     {fields.map(f=>(
       <div key={f.id} style={{marginBottom:13}}>
         <label style={{display:"block",fontSize:10,fontWeight:700,letterSpacing:".15em",textTransform:"uppercase",color:C.textDim}}>{f.l}</label>
@@ -343,8 +374,8 @@ const TABLE_MAP = {
   ]},
   cronologia: { table:"timeline", fields:[
     {id:"date",l:"Data",ph:"Anno 1, Giorno X"},{id:"title",l:"Titolo",ph:"Evento..."},
-    {id:"description",l:"Descrizione",ph:"Cosa accadde...",ta:true},{id:"image_path",l:"URL Immagine",ph:"https://..."}
-  ]},
+    {id:"description",l:"Descrizione",ph:"Cosa accadde...",ta:true}
+  ], hasImage:true, imageBucket:"timeline-images", imageField:"image_path"},
   arcano: { table:"arcane", fields:[
     {id:"name",l:"Nome",ph:"Nome"},{id:"icon",l:"Icona",ph:"✨"},
     {id:"school",l:"Scuola",ph:"Proibito"},{id:"desc",l:"Descrizione",ph:"...",ta:true}
@@ -665,6 +696,9 @@ export default function App(){
       onSave={saveGeneric}
       saving={saving}
       onChange={(id,val)=>setGenericVals(v=>({...v,[id]:val}))}
+      hasImage={TABLE_MAP[genericModal.view]?.hasImage||false}
+      imageBucket={TABLE_MAP[genericModal.view]?.imageBucket||""}
+      imageField={TABLE_MAP[genericModal.view]?.imageField||"image_path"}
     />}
   </div>;
 }
