@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'House Valerius',
+  title: 'Terre Perdute',
   description: 'Gestione campagna D&D',
   manifest: '/manifest.json',
   themeColor: '#0e0b14',
